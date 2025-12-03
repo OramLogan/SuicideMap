@@ -400,7 +400,10 @@ app.layout = dbc.Container([
        
         dbc.Row([
             dbc.Col([
-                html.Label("Filter by rate (click to toggle):", className="me-3 text-secondary small"),
+                html.Label([
+                    html.Strong("Filter by rate"),
+                    " (click to toggle):"
+                ], className="me-3 text-secondary small"),
                 html.Div([
                     html.Div(
                         id=f"legend-{band}", 
@@ -428,7 +431,7 @@ app.layout = dbc.Container([
             dbc.Col([
                 dbc.Card([
                     dbc.CardBody([
-                        html.H5("State Details", className="mb-3", style={"color": TEXT_PRIMARY}),
+                        html.H5("Selected State Details", className="mb-3", style={"color": TEXT_PRIMARY}),
                         html.Div(id="state-stats", className="mb-3"),
                         html.Hr(style={"borderColor": DARK_BORDER}),
                         html.Div(id="ranking-text", className="mb-2 text-secondary small"),
@@ -598,7 +601,7 @@ def update_map(year, active_bands, selected_state):
         ))
     
     fig.update_layout(
-        title=dict(text=f"Suicide Rates per 100,000 Population — {year}", x=0.5, 
+        title=dict(text=f"<b>Suicide Rates per 100,000 Population - {year}</b>", x=0.5, 
                    font=dict(size=16, color=TEXT_PRIMARY)),
         geo=dict(
             scope="usa", showlakes=True, lakecolor=DARK_BG,
@@ -687,17 +690,17 @@ def update_state_stats(state_name):
     
     return html.Div([
         html.H5(state_name, className="mb-3", style={"color": ACCENT_CYAN}),
-        html.P([html.Strong("Minimum: ", style={"color": TEXT_SECONDARY}), 
+        html.P([html.Strong("Minimum Rate: ", style={"color": TEXT_SECONDARY}), 
                 f"{min_rate:.1f} ({int(min_year)})"], style={"color": TEXT_PRIMARY, "margin": "4px 0"}),
-        html.P([html.Strong("Maximum: ", style={"color": TEXT_SECONDARY}), 
+        html.P([html.Strong("Maximum Rate: ", style={"color": TEXT_SECONDARY}), 
                 f"{max_rate:.1f} ({int(max_year)})"], style={"color": TEXT_PRIMARY, "margin": "4px 0"}),
-        html.P([html.Strong("Average: ", style={"color": TEXT_SECONDARY}), 
+        html.P([html.Strong("Average Rate: ", style={"color": TEXT_SECONDARY}), 
                 f"{avg_rate:.1f}"], style={"color": TEXT_PRIMARY, "margin": "4px 0"}),
         html.Hr(style={"borderColor": DARK_BORDER, "margin": "12px 0"}),
-        html.P([html.Strong("Largest Increase: ", style={"color": ACCENT_GREEN}), 
+        html.P([html.Strong("Largest Increase: ", style={"color": ACCENT_ORANGE}), 
                 f"+{inc['Change']:.1f} ({int(inc['Year']-1)}→{int(inc['Year'])})"], 
                style={"color": TEXT_PRIMARY, "margin": "4px 0", "fontSize": "0.9rem"}),
-        html.P([html.Strong("Largest Decrease: ", style={"color": ACCENT_ORANGE}), 
+        html.P([html.Strong("Largest Decrease: ", style={"color": ACCENT_GREEN}), 
                 f"{dec['Change']:.1f} ({int(dec['Year']-1)}→{int(dec['Year'])})"], 
                style={"color": TEXT_PRIMARY, "margin": "4px 0", "fontSize": "0.9rem"}),
     ])
@@ -718,7 +721,7 @@ def update_ranking(state_name, year):
     rank = df_year[df_year["State"] == state_name]["Rank"].values
     
     if len(rank) > 0:
-        return f"Rank in {year}: #{rank[0]} of {len(df_year)}"
+        return f"{state_name} Suicide Rate Rank in {year}: #{rank[0]} of {len(df_year)}"
     return ""
 
 
@@ -815,15 +818,21 @@ def update_regional_chart(state_name, year):
     
     max_rate = df_region["Rate"].max()
     fig.update_layout(
-        title=dict(text=f"{region} ({year})", font=dict(size=12, color=TEXT_SECONDARY)),
+        title=dict(
+            text=f"{state_name} Compared to Region ({year})",
+            font=dict(size=12, color=TEXT_SECONDARY),
+            x=0,
+            xanchor="left"
+        ),
         xaxis=dict(title="Rate", range=[0, max_rate * 1.15], color=TEXT_SECONDARY, 
                   showgrid=False, tickfont=dict(size=10), fixedrange=True),
         yaxis=dict(color=TEXT_SECONDARY, tickfont=dict(size=9), fixedrange=True),
-        margin=dict(l=100, r=10, t=30, b=30),
+        margin=dict(l=100, r=10, t=40, b=30),
         showlegend=False,
         dragmode=False,
         paper_bgcolor=DARK_CARD, plot_bgcolor=DARK_CARD
     )
+    
     return fig
 
 
